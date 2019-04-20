@@ -9,8 +9,8 @@ import matplotlib.animation as animation
 
 S = serial.Serial('/dev/ttyACM0', 115200)  # open serial port
 
-num_bins = 128 # limited memory on ATmega2560
-freq = 100 # Hz, based on sampling rate,
+num_bins = 512 # limited memory on ATmega2560
+freq = 1000 # Hz, based on sampling rate,
 
 
 # Create figure for plotting
@@ -31,11 +31,12 @@ print xs
 def animate(i, xs, fft_result):
     length = 0
     while(True):
-        S.reset_input_buffer()                  # clear input
+
         fft_result = S.readline().split(',')    # read line (everything up to \n) and convert to array
         fft_result = fft_result[:-1]            # the last element in the array is a newline and carrage return. Must be removed.
 
         if( len(fft_result) == num_bins):
+            S.reset_input_buffer()               # clear input
             for i in range(num_bins):
                 fft_result[i] = abs(complex(fft_result[i]))
             print "fft result: \n:" , fft_result
@@ -47,7 +48,7 @@ def animate(i, xs, fft_result):
     ax.plot(xs, fft_result)
 
     # Format plot
-    plt.axis([0, 120, 0, 1000])
+    plt.axis([0, freq, 0, 10000])
     # plt.xticks(rotation=45, ha='right')
     # plt.subplots_adjust(bottom=0.30)
     plt.title('title')
